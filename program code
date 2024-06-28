@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
+contract DrivingLicense {
+    mapping(address => uint) public age;
+    mapping(address => bool) public ownsVehicle;
+
+    function setAge(uint _age) public {
+        require(_age > 0 && _age < 150, "Invalid age provided.");
+        age[msg.sender] = _age;
+    }
+
+    function setVehicleOwnership(bool _ownsVehicle) public {
+        ownsVehicle[msg.sender] = _ownsVehicle;
+    }
+
+    function checkEligibility() public view returns (bool) {
+        uint userAge = age[msg.sender];
+        bool vehicleOwnership = ownsVehicle[msg.sender];
+
+        require(userAge > 0, "Age is not set. Please set your age first.");
+        require(vehicleOwnership, "Vehicle ownership status is not set or you don't own a vehicle.");
+
+        if (userAge < 18) {
+            revert("You are not eligible for a driving license.");
+        }
+
+        return true;
+    }
+}

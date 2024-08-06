@@ -1,30 +1,49 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-contract DrivingLicense {
-    mapping(address => uint) public age;
-    mapping(address => bool) public ownsVehicle;
+contract LicenseManager {
+    // Mapping to store the user's age
+    mapping(address => uint) private userAge;
 
-    function setAge(uint _age) public {
-        require(_age > 0 && _age < 150, "Invalid age provided.");
-        age[msg.sender] = _age;
+    // Mapping to store vehicle ownership status
+    mapping(address => bool) private hasVehicle;
+
+    // Function to update user's age
+    function updateAge(uint _age) public {
+        // Check if the age is within a valid range
+        require(_age > 0 && _age < 150, "Invalid age.");
+
+        // Update the age mapping
+        userAge[msg.sender] = _age;
     }
 
-    function setVehicleOwnership(bool _ownsVehicle) public {
-        ownsVehicle[msg.sender] = _ownsVehicle;
+    // Function to update vehicle ownership status
+    function updateVehicleOwnership(bool _hasVehicle) public {
+        // Update the vehicle ownership mapping
+        hasVehicle[msg.sender] = _hasVehicle;
     }
 
-    function checkEligibility() public view returns (bool) {
-        uint userAge = age[msg.sender];
-        bool vehicleOwnership = ownsVehicle[msg.sender];
+    // Function to verify driving license eligibility
+    function verifyEligibility() public view returns (bool) {
+        uint age = userAge[msg.sender];
+        bool ownsVehicle = hasVehicle[msg.sender];
 
-        require(userAge > 0, "Age is not set. Please set your age first.");
-        require(vehicleOwnership, "Vehicle ownership status is not set or you don't own a vehicle.");
+        // Ensure age has been set
+        require(age > 0, "Age not set. Please update your age.");
 
-        if (userAge < 18) {
+        // Ensure vehicle ownership status has been set
+        require(ownsVehicle, "Vehicle ownership not set. Please update your status.");
+
+        // Check eligibility criteria
+        if (age < 18) {
+            // User is not eligible for a driving license
             revert("You are not eligible for a driving license.");
         }
 
+        // Confirm the user's age is 18 or greater
+        assert(ownsVehicle == true);
+
+        // Return eligibility status
         return true;
     }
 }
